@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ app_name }}</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="icon-btn" id="menuBtn" onclick="toggleSidebar(true)"><i class="bi bi-list"></i></button>
+  <div class="search-box">
+    <i class="bi bi-search"></i>
+    <input id="search" placeholder="Telusuri di Drive">
+  </div>
+  <button class="icon-btn" id="notesTopBtn" onclick="toggleNotesFloating()" title="Catatan"><i class="bi bi-journal-text"></i></button>
+</header>
+
+<!-- Upload Manager: nempel di atas, nampung banyak upload sekaligus dengan jeda/lanjut/batal -->
+<!-- Task Manager: proses Salin/Pindah/Extract yang jalan di background, dengan progress % dan bisa di-minimize -->
+<div class="sticky-banners">
+  <div id="uploadManager" class="upload-manager">
+    <div class="upload-manager-header" onclick="toggleUploadManagerCollapse()">
+      <span><i class="bi bi-cloud-arrow-up"></i> Upload <span id="uploadManagerCount" class="upload-manager-count"></span></span>
+      <div class="upload-manager-header-actions">
+        <button class="icon-btn" onclick="event.stopPropagation(); toggleUploadManagerCollapse()"><i class="bi bi-chevron-up" id="uploadManagerChevron"></i></button>
+        <button class="icon-btn" onclick="event.stopPropagation(); closeUploadManager()"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+    <div class="upload-manager-body" id="uploadManagerBody"></div>
+  </div>
+
+  <div id="taskManager" class="upload-manager">
+    <div class="upload-manager-header" onclick="toggleTaskManagerCollapse()">
+      <span><i class="bi bi-arrow-left-right"></i> Proses File <span id="taskManagerCount" class="upload-manager-count"></span></span>
+      <div class="upload-manager-header-actions">
+        <button class="icon-btn" onclick="event.stopPropagation(); toggleTaskManagerCollapse()"><i class="bi bi-chevron-up" id="taskManagerChevron"></i></button>
+        <button class="icon-btn" onclick="event.stopPropagation(); closeTaskManager()"><i class="bi bi-x-lg"></i></button>
+      </div>
+    </div>
+    <div class="upload-manager-body" id="taskManagerBody"></div>
+  </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-title">{{ app_name }} <span class="sidebar-version">v{{ app_version }}</span></div>
+  <nav class="sidebar-menu">
+    <a href="/" class="sidebar-item"><i class="bi bi-clock-history"></i> Terbaru</a>
+    <label class="sidebar-item">
+      <i class="bi bi-upload"></i> Upload
+      <input type="file" id="sidebarUpload" multiple style="display:none">
+    </label>
+    <a href="#" class="sidebar-item" onclick="openTrash(); return false;"><i class="bi bi-trash"></i> Sampah</a>
+    <a href="#" class="sidebar-item" onclick="openCli(); return false;"><i class="bi bi-hdd-network"></i> SSH Terminal</a>
+    <a href="#" class="sidebar-item" onclick="openPm2(); return false;"><i class="bi bi-boxes"></i> PM2</a>
+    <a href="#" class="sidebar-item" onclick="openSettings(); return false;"><i class="bi bi-gear"></i> Setelan</a>
+    <a href="#" class="sidebar-item" onclick="return false;"><i class="bi bi-question-circle"></i> Bantuan &amp; masukan</a>
+    <a href="/logout" class="sidebar-item"><i class="bi bi-box-arrow-right"></i> Keluar</a>
+  </nav>
+
+  <div class="sidebar-panel">
+
+    <div class="panel-group">
+      <button class="panel-header" onclick="togglePanel('panelControl')">
+        <span><i class="bi bi-speedometer2"></i> Panel Kontrol</span>
+        <i class="bi bi-chevron-down panel-chevron" id="chev-panelControl"></i>
+      </button>
+      <div class="panel-body panel-body-outer" id="panelControl">
+
+        <div class="panel-group nested">
+          <button class="panel-header" onclick="togglePanel('panelRam')">
+            <span><i class="bi bi-cpu"></i> Monitor Sistem</span>
+            <i class="bi bi-chevron-down panel-chevron" id="chev-panelRam"></i>
+          </button>
+          <div class="panel-body open" id="panelRam">
+            <div class="mini-gauge" id="batteryGauge" style="display:none;">
+              <div class="mini-gauge-label">
+                <span><i class="bi bi-battery-half" id="batteryIcon"></i> Baterai</span>
+                <span id="batteryPercentText">&mdash;</span>
+              </div>
+              <div class="mini-gauge-bar"><div class="mini-gauge-fill battery" id="batteryFill"></div></div>
+              <div class="mini-gauge-sub" id="batterySub">&mdash;</div>
+            </div>
+            <div class="mini-gauge">
+              <div class="mini-gauge-label"><span>CPU</span><span id="cpuPercentText">&mdash;</span></div>
+              <div class="mini-gauge-bar"><div class="mini-gauge-fill cpu" id="cpuFill"></div></div>
+            </div>
+            <div class="mini-gauge">
+              <div class="mini-gauge-label"><span>RAM</span><span id="ramPercentText">&mdash;</span></div>
+              <div class="mini-gauge-bar"><div class="mini-gauge-fill" id="ramFill"></div></div>
+              <div class="mini-gauge-sub" id="ramSub">&mdash;</div>
+            </div>
+            <div class="mini-gauge" id="swapGauge" style="display:none;">
+              <div class="mini-gauge-label"><span>Swap RAM</span><span id="swapPercentText">&mdash;</span></div>
+              <div class="mini-gauge-bar"><div class="mini-gauge-fill swap" id="swapFill"></div></div>
+              <div class="mini-gauge-sub" id="swapSub">&mdash;</div>
+            </div>
+            <div class="sys-extra-row" id="zramRow" style="display:none;">
+              <span><i class="bi bi-hdd-stack"></i> Zram</span>
+              <span id="zramText">&mdash;</span>
+            </div>
+            <div class="sys-extra-row">
+              <span><i class="bi bi-clock-history"></i> Uptime</span>
+              <span id="sysUptime">&mdash;</span>
+            </div>
+            <div class="sys-proc-list" id="sysProcList"></div>
+            <button class="boost-btn" id="boostBtn" onclick="boostMemory()">
+              <i class="bi bi-lightning-charge-fill"></i> Boost / Bersihkan Memori
+            </button>
+            <div class="boost-result" id="boostResult"></div>
+          </div>
+        </div>
+
+        <div class="panel-group nested">
+          <button class="panel-header" onclick="togglePanel('panelServer')">
+            <span><i class="bi bi-hdd-network"></i> Manajemen Server</span>
+            <i class="bi bi-chevron-down panel-chevron" id="chev-panelServer"></i>
+          </button>
+          <div class="panel-body" id="panelServer">
+            <button class="boost-btn restart-app-btn" onclick="restartApp()">
+              <i class="bi bi-arrow-clockwise"></i> Restart Aplikasi Ini
+            </button>
+            <div class="boost-result" id="restartAppResult"></div>
+
+            <div class="server-services-label">Service</div>
+            <div id="featuredServicesList" class="featured-services-list">
+              <div class="panel-loading">Memuat service...</div>
+            </div>
+
+            <div class="panel-group nested sub">
+              <button class="panel-header sub-panel-header" onclick="togglePanel('panelOtherServices')">
+                <span>Service lainnya <span id="otherServicesCount" class="sub-panel-count"></span></span>
+                <i class="bi bi-chevron-down panel-chevron" id="chev-panelOtherServices"></i>
+              </button>
+              <div class="panel-body" id="panelOtherServices">
+                <div id="servicesList" class="services-list"></div>
+              </div>
+            </div>
+
+            <div class="panel-group nested sub">
+              <button class="panel-header sub-panel-header" onclick="togglePanel('panelDeps')">
+                <span><i class="bi bi-box-seam"></i> Aplikasi &amp; Dependensi</span>
+                <i class="bi bi-chevron-down panel-chevron" id="chev-panelDeps"></i>
+              </button>
+              <div class="panel-body" id="panelDeps">
+                <div id="depsBox" class="deps-box">
+                  <div class="panel-loading">Memuat dependensi...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-group nested">
+          <button class="panel-header" onclick="togglePanel('panelNetwork')">
+            <span><i class="bi bi-router"></i> Jaringan</span>
+            <i class="bi bi-chevron-down panel-chevron" id="chev-panelNetwork"></i>
+          </button>
+          <div class="panel-body" id="panelNetwork">
+            <div id="networkBox" class="network-box">
+              <div class="panel-loading">Memuat info jaringan...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-group nested">
+          <button class="panel-header" onclick="togglePanel('panelSecurity')">
+            <span><i class="bi bi-shield-lock"></i> Keamanan</span>
+            <i class="bi bi-chevron-down panel-chevron" id="chev-panelSecurity"></i>
+          </button>
+          <div class="panel-body" id="panelSecurity">
+            <div id="securityBox" class="security-box">
+              <div class="panel-loading">Memuat data keamanan...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-group nested">
+          <button class="panel-header" onclick="togglePanel('panelCrypto')">
+            <span><i class="bi bi-currency-bitcoin"></i> Berita Crypto</span>
+            <i class="bi bi-chevron-down panel-chevron" id="chev-panelCrypto"></i>
+          </button>
+          <div class="panel-body" id="panelCrypto">
+            <div id="cryptoList" class="crypto-list">
+              <div class="panel-loading">Memuat harga...</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-group nested">
+          <button class="panel-header" onclick="togglePanel('panelWeather')">
+            <span><i class="bi bi-cloud-sun-fill"></i> Cuaca</span>
+            <i class="bi bi-chevron-down panel-chevron" id="chev-panelWeather"></i>
+          </button>
+          <div class="panel-body" id="panelWeather">
+            <div id="weatherBox" class="weather-box">
+              <div class="panel-loading">Meminta lokasi...</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sidebar-storage">
+    <div class="storage-label"><i class="bi bi-hdd"></i> Penyimpanan</div>
+    <div class="storage-bar">
+      <div class="storage-bar-fill" style="width:{{ disk.percent }}%"></div>
+    </div>
+    <div class="storage-text">{{ disk.used_gb }} GB dari {{ disk.total_gb }} GB telah digunakan</div>
+  </div>
+</aside>
+
+<!-- Settings popover (mengambang di depan sidebar) -->
+<div id="settingsModal" class="settings-modal" onclick="closeSettings()">
+  <div class="settings-box" onclick="event.stopPropagation()">
+    <div class="settings-header">
+      <span>Setelan</span>
+      <div class="modal-close" onclick="closeSettings()"><i class="bi bi-x-lg"></i></div>
+    </div>
+    <form id="hiddenForm" action="/settings/hidden" method="post" class="settings-row">
+      <label class="switch-row">
+        <i class="bi bi-eye-slash switch-row-icon"></i>
+        <span>Sembunyikan file tersembunyi (diawali titik)</span>
+        <input type="checkbox" name="hide_dotfiles" value="1" id="hideDotfilesToggle" {% if hide_dotfiles %}checked{% endif %} onchange="document.getElementById('hiddenForm').submit()">
+      </label>
+    </form>
+    <form id="sortForm" action="/settings/sort" method="post" class="settings-row">
+      <label class="switch-row">
+        <i class="bi bi-sort-alpha-down-alt switch-row-icon"></i>
+        <span>Urutkan Z-A secara default</span>
+        <input type="checkbox" name="sort_desc" value="1" id="sortDescToggle" {% if sort_desc %}checked{% endif %} onchange="document.getElementById('sortForm').submit()">
+      </label>
+    </form>
+    <div class="settings-row">
+      <label class="switch-row">
+        <i class="bi bi-text-wrap switch-row-icon"></i>
+        <span>Bungkus baris panjang di editor kode</span>
+        <input type="checkbox" id="wordWrapToggle" onchange="toggleWordWrap(this.checked)">
+      </label>
+    </div>
+    <div class="settings-row">
+      <label class="switch-row">
+        <i class="bi bi-trash switch-row-icon"></i>
+        <span>Konfirmasi sebelum hapus file</span>
+        <input type="checkbox" id="confirmDeleteToggle" onchange="toggleConfirmDelete(this.checked)">
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Sampah (item terhapus, dipulihkan atau dihapus permanen otomatis dalam 7 hari) -->
+<div id="trashModal" class="settings-modal trash-modal" onclick="closeTrash()">
+  <div class="settings-box trash-box" onclick="event.stopPropagation()">
+    <div class="settings-header">
+      <span><i class="bi bi-trash"></i> Sampah</span>
+      <div class="modal-close" onclick="closeTrash()"><i class="bi bi-x-lg"></i></div>
+    </div>
+    <div class="trash-hint">Item di sini dihapus permanen otomatis setelah 7 hari.</div>
+    <div class="trash-list" id="trashList">
+      <div class="panel-loading">Memuat Sampah...</div>
+    </div>
+    <div class="trash-actions">
+      <button type="button" class="btn-secondary trash-empty-btn" onclick="emptyTrash()"><i class="bi bi-trash3"></i> Kosongkan Sampah</button>
+    </div>
+  </div>
+</div>
+
+<!-- Halaman PM2 (dibuka dari sidebar): daftar proses + tombol buka lewat Tailscale -->
+<div id="pm2Modal" class="settings-modal pm2-modal" onclick="closePm2()">
+  <div class="settings-box pm2-box" onclick="event.stopPropagation()">
+    <div class="settings-header">
+      <span><i class="bi bi-boxes"></i> PM2</span>
+      <div class="modal-close" onclick="closePm2()"><i class="bi bi-x-lg"></i></div>
+    </div>
+    <div class="pm2-summary">
+      <span id="pm2Summary">Memuat...</span>
+      <button type="button" class="icon-btn" onclick="loadPm2()" title="Segarkan"><i class="bi bi-arrow-clockwise"></i></button>
+    </div>
+    <div class="pm2-list" id="pm2List"><div class="panel-loading">Memuat PM2...</div></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="location-switch">
+    <button class="icon-btn" onclick="toggleMenu(event, this)" title="Pindah lokasi"><i class="bi bi-hdd-stack"></i></button>
+    <div class="dropdown">
+      {% for code, info in locations.items() %}
+      <a href="/switch-location/{{ code }}" class="{{ 'active' if code == current_loc else '' }}">
+        <i class="bi {{ 'bi-check-circle-fill' if code == current_loc else 'bi-hdd' }}"></i> {{ info[0] }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="tab active">{{ locations[current_loc][0] }}</div>
+</div>
+
+<div class="path-bar">
+  {% if current %}
+  <a href="/browse/{{ parent }}" class="back-link"><i class="bi bi-arrow-left"></i> Kembali</a>
+  <span class="path-current">{{ current }}</span>
+  {% else %}
+  <span class="path-current">agentuser</span>
+  {% endif %}
+  <button class="icon-btn sort-btn" onclick="toggleSort()" title="Urutkan A-Z / Z-A">
+    <i class="bi {{ 'bi-sort-alpha-up' if sort_desc else 'bi-sort-alpha-down' }}" id="sortIcon"></i>
+  </button>
+  <div class="path-menu">
+    <button class="icon-btn kebab" onclick="toggleMenu(event, this)"><i class="bi bi-three-dots-vertical"></i></button>
+    <div class="dropdown">
+      <a href="#" onclick="return openTerminalHere()"><i class="bi bi-hdd-network"></i> Buka Terminal di sini</a>
+    </div>
+  </div>
+</div>
+
+<form action="/upload/{{ current }}" method="post" enctype="multipart/form-data" class="upload-bar" id="mainUploadForm" data-current="{{ current }}">
+  <label class="upload-label">
+    <i class="bi bi-upload"></i> Upload
+    <input type="file" name="file" id="mainUploadInput" multiple>
+  </label>
+  <button type="button" class="upload-label" onclick="document.getElementById('mkdirBox').classList.toggle('show')">
+    <i class="bi bi-folder-plus"></i> Folder
+  </button>
+</form>
+
+<form action="/mkdir" method="post" id="mkdirBox" class="mkdir-box">
+  <input type="hidden" name="current" value="{{ current }}">
+  <input type="text" name="folder" placeholder="Nama folder baru" required>
+  <button type="submit"><i class="bi bi-check2"></i></button>
+</form>
+
+<div id="list" class="file-list" data-sort-desc="{{ '1' if sort_desc else '0' }}">
+{% for item in items %}
+<div class="row-item file-card" data-name="{{ item.name|lower }}" data-ext="{{ item.ext }}" data-path="{{ item.path }}" data-isdir="{{ item.is_dir }}">
+
+  <div class="row-checkbox">
+    <input type="checkbox" class="item-checkbox" onclick="event.stopPropagation()" onchange="onCheckboxChange()">
+  </div>
+
+  <div class="row-icon">
+    {% if item.is_dir %}
+      <i class="bi bi-folder-fill icon-folder"></i>
+    {% elif item.ext in ['jpg','jpeg','png','gif','webp'] %}
+      <img class="thumb" src="/view/{{ item.path }}" loading="lazy">
+    {% elif item.ext in ['mp4','mkv','avi','mov','webm'] %}
+      <div class="icon-badge badge-video"><i class="bi bi-film"></i></div>
+    {% elif item.ext=='pdf' %}
+      <div class="icon-badge badge-pdf"><i class="bi bi-file-earmark-pdf-fill"></i></div>
+    {% elif item.ext in ['mp3','wav','ogg'] %}
+      <div class="icon-badge badge-audio"><i class="bi bi-music-note-beamed"></i></div>
+    {% elif item.ext=='zip' %}
+      <div class="icon-badge badge-zip"><i class="bi bi-file-earmark-zip-fill"></i></div>
+    {% else %}
+      <div class="icon-badge badge-file"><i class="bi bi-file-earmark-fill"></i></div>
+    {% endif %}
+  </div>
+
+  <div class="row-info" onclick="openItem(this)">
+    <div class="row-name">{{ item.name }}</div>
+    <div class="row-meta">
+      {% if item.is_dir %}Folder{% else %}{{ item.ext|upper }}{% endif %}
+      {% if not item.is_dir %} &middot; {{ item.size_human }}{% endif %}
+      &middot; {{ item.modified_human }}
+    </div>
+  </div>
+
+  <div class="row-menu">
+    <button class="icon-btn kebab" onclick="toggleMenu(event, this)"><i class="bi bi-three-dots-vertical"></i></button>
+    <div class="dropdown">
+      {% if item.is_dir %}
+        <a href="/browse/{{ item.path }}"><i class="bi bi-folder2-open"></i> Buka</a>
+        <a href="/zip/{{ item.path }}"><i class="bi bi-file-earmark-zip"></i> Zip</a>
+      {% else %}
+        <a href="/view/{{ item.path }}" target="_blank"><i class="bi bi-eye"></i> Buka</a>
+        <a href="/download/{{ item.path }}"><i class="bi bi-download"></i> Download</a>
+        {% if item.editable %}
+        <a href="#" onclick="return openInTextEditor('{{ item.path }}')"><i class="bi bi-code-slash"></i> Edit</a>
+        {% endif %}
+        {% if item.ext=='zip' %}
+        <a href="#" onclick="return extractZip('{{ item.path }}')"><i class="bi bi-box-arrow-in-down"></i> Extract</a>
+        {% endif %}
+      {% endif %}
+      <a href="#" onclick="return renamePrompt('{{ item.path }}', '{{ item.name }}')"><i class="bi bi-pencil"></i> Ganti nama</a>
+      <a href="#" onclick="return cutOrCopyItem('{{ item.path }}', '{{ item.name }}', 'move')"><i class="bi bi-scissors"></i> Pindah</a>
+      <a href="#" onclick="return cutOrCopyItem('{{ item.path }}', '{{ item.name }}', 'copy')"><i class="bi bi-copy"></i> Salin</a>
+      <a href="#" class="danger" onclick="return confirmDelete('{{ item.path }}')"><i class="bi bi-trash"></i> Hapus</a>
+    </div>
+  </div>
+
+</div>
+{% endfor %}
+</div>
+
+<!-- Modal preview -->
+<div id="previewModal" class="modal">
+  <div class="modal-close" onclick="closePreview()"><i class="bi bi-x-lg"></i></div>
+  <div class="modal-body" id="modalBody"></div>
+</div>
+
+<!-- Bar mode tempel: muncul setelah "Pindah" / "Salin" dipilih, sampai user menekan "Tempel di sini" -->
+<div id="clipboardBar" class="selection-bar clipboard-bar">
+  <div class="selection-info">
+    <i class="bi bi-clipboard-check"></i>
+    <span id="clipboardInfo">0 item</span>
+  </div>
+  <div class="selection-actions">
+    <button class="icon-btn" onclick="cancelClipboard()" title="Batal"><i class="bi bi-x-lg"></i></button>
+    <button class="btn-primary clipboard-paste-btn" onclick="pasteHere()"><i class="bi bi-clipboard-plus"></i> Tempel di sini</button>
+  </div>
+</div>
+
+<!-- Modal konflik nama saat Tempel: Batal / Simpan salinan / Timpa -->
+<div id="overwriteModal" class="modal overwrite-modal" onclick="resolveOverwrite('cancel')">
+  <div class="settings-box overwrite-box" onclick="event.stopPropagation()">
+    <div class="settings-header">
+      <span>Nama sudah ada</span>
+      <div class="modal-close" onclick="resolveOverwrite('cancel')"><i class="bi bi-x-lg"></i></div>
+    </div>
+    <div class="overwrite-message" id="overwriteMessage"></div>
+    <div class="overwrite-actions">
+      <button type="button" class="btn-secondary" onclick="resolveOverwrite('cancel')">Batal</button>
+      <button type="button" class="btn-secondary" onclick="resolveOverwrite('copy')">Simpan salinan</button>
+      <button type="button" class="btn-primary" onclick="resolveOverwrite('overwrite')">Timpa</button>
+    </div>
+  </div>
+</div>
+
+<!-- SSH Terminal: sesi shell persisten (PTY) di server, ditampilkan lewat xterm.js -->
+<div id="cliModal" class="modal cli-modal" onclick="closeCli()">
+  <div class="cli-box" id="cliBox" onclick="event.stopPropagation()">
+    <div class="settings-header cli-header">
+      <span><i class="bi bi-hdd-network"></i> SSH Terminal</span>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button class="icon-btn" title="Perkecil font" onclick="sshZoomOut()"><i class="bi bi-zoom-out"></i></button>
+        <button class="icon-btn" title="Perbesar font" onclick="sshZoomIn()"><i class="bi bi-zoom-in"></i></button>
+        <button class="icon-btn" title="Fullscreen" onclick="toggleCliFullscreen()"><i class="bi bi-arrows-fullscreen" id="cliFullscreenIcon"></i></button>
+        <div class="modal-close" onclick="closeCli()"><i class="bi bi-x-lg"></i></div>
+      </div>
+    </div>
+    <div class="cli-term-wrap" id="cliTermWrap"></div>
+    <div class="cli-keybar" id="cliKeybar">
+      <button type="button" class="cli-key" onclick="sshSendKey('\x1b')">ESC</button>
+      <button type="button" class="cli-key" onclick="sshSendKey('\t')">TAB</button>
+      <button type="button" class="cli-key cli-key-toggle" id="cliCtrlBtn" onclick="sshToggleCtrl()">CTRL</button>
+      <button type="button" class="cli-key cli-key-toggle" id="cliAltBtn" onclick="sshToggleAlt()">ALT</button>
+      <button type="button" class="cli-key" onclick="sshSendKey('\x1b[H')">HOME</button>
+      <button type="button" class="cli-key" onclick="sshSendKey('\x1b[F')">END</button>
+      <button type="button" class="cli-key" onclick="sshSendKey('\x1b[5~')">PGUP</button>
+      <button type="button" class="cli-key" onclick="sshSendKey('\x1b[6~')">PGDN</button>
+      <button type="button" class="cli-key" onclick="sshSendKey('\x1b[A')"><i class="bi bi-arrow-up"></i></button>
+      <button type="button" class="cli-key" onclick="sshSendKey('\x1b[D')"><i class="bi bi-arrow-left"></i></button>
+      <button type="button" class="cli-key" onclick="sshSendKey('\x1b[B')"><i class="bi bi-arrow-down"></i></button>
+      <button type="button" class="cli-key" onclick="sshSendKey('\x1b[C')"><i class="bi bi-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- Toolbar aksi mode seleksi (Pindah / Salin / Hapus) -->
+<div id="selectionBar" class="selection-bar">
+  <div class="selection-info">
+    <button class="icon-btn" onclick="exitSelectMode()" title="Batal"><i class="bi bi-x-lg"></i></button>
+    <label class="select-all-label">
+      <input type="checkbox" id="selectAllCb" onchange="toggleSelectAll(this)">
+      <span id="selectionCount">0 dipilih</span>
+    </label>
+  </div>
+  <div class="selection-actions">
+    <button class="icon-btn" onclick="cutOrCopySelection('move')" title="Pindah"><i class="bi bi-scissors"></i></button>
+    <button class="icon-btn" onclick="cutOrCopySelection('copy')" title="Salin"><i class="bi bi-copy"></i></button>
+    <button class="icon-btn" onclick="batchDelete()" title="Hapus"><i class="bi bi-trash"></i></button>
+  </div>
+</div>
+
+<!-- Panel Catatan mengambang (bisa digeser lewat headernya) -->
+<div id="notesFloating" class="notes-floating">
+  <div class="notes-floating-header" id="notesFloatingHeader">
+    <span><i class="bi bi-journal-text"></i> Catatan</span>
+    <button class="icon-btn" onclick="toggleNotesFloating()"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <div class="notes-floating-body">
+    <form class="note-add-form" id="noteAddForm" onsubmit="return addNote(event)">
+      <input type="text" id="noteTitleInput" placeholder="Judul catatan..." autocomplete="off"
+        onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('noteInput').focus();}">
+      <textarea id="noteInput" placeholder="Tulis catatan..." rows="3"></textarea>
+      <button type="submit"><i class="bi bi-plus-lg"></i></button>
+    </form>
+    <div id="notesList" class="notes-list"></div>
+  </div>
+</div>
+
+<!-- Panel Teks Editor mengambang (editor kode, dibuka dari menu "Edit" tiap file) -->
+<div id="scratchFloating" class="notes-floating scratch-floating">
+  <div class="notes-floating-header" id="scratchFloatingHeader">
+    <span><i class="bi bi-code-slash"></i> Teks Editor</span>
+    <div class="editor-header-actions">
+      <button class="icon-btn" title="Fullscreen" onclick="toggleEditorFullscreen()"><i class="bi bi-arrows-fullscreen" id="editorFullscreenIcon"></i></button>
+      <button class="icon-btn" onclick="toggleScratchFloating()"><i class="bi bi-x-lg"></i></button>
+    </div>
+  </div>
+  <div class="notes-floating-body scratch-body">
+    <div class="editor-topbar">
+      <div class="editor-topbar-row">
+        <select id="editorFileSelect" class="editor-file-select" onchange="onEditorFileSelect(this.value)"></select>
+        <button class="icon-btn" title="Undo" onclick="editorUndo()"><i class="bi bi-arrow-counterclockwise"></i></button>
+        <button class="icon-btn" title="Redo" onclick="editorRedo()"><i class="bi bi-arrow-clockwise"></i></button>
+        <button class="icon-btn" title="Cari & Ganti" onclick="toggleEditorSearch()"><i class="bi bi-search"></i></button>
+        <button class="icon-btn" title="Save As" onclick="saveAsEditorFile()"><i class="bi bi-file-earmark-arrow-up"></i></button>
+      </div>
+      <div class="editor-search-bar" id="editorSearchBar" style="display:none;">
+        <div class="editor-search-row">
+          <input type="text" id="editorSearchInput" class="editor-search-input" placeholder="Cari kode... (Enter)"
+            onkeydown="if(event.key==='Enter'){event.preventDefault(); event.shiftKey ? editorSearchPrev() : editorSearchNext();} if(event.key==='Escape'){toggleEditorSearch();}">
+          <span id="editorSearchCount" class="editor-search-count"></span>
+          <button class="icon-btn" title="Sebelumnya" onclick="editorSearchPrev()"><i class="bi bi-chevron-up"></i></button>
+          <button class="icon-btn" title="Berikutnya" onclick="editorSearchNext()"><i class="bi bi-chevron-down"></i></button>
+          <button class="icon-btn" title="Tutup pencarian" onclick="toggleEditorSearch()"><i class="bi bi-x"></i></button>
+        </div>
+        <div class="editor-search-row">
+          <input type="text" id="editorReplaceInput" class="editor-search-input" placeholder="Ganti dengan..."
+            onkeydown="if(event.key==='Enter'){event.preventDefault(); editorReplaceOne();}">
+          <button class="note-action" title="Ganti yang aktif" onclick="editorReplaceOne()"><i class="bi bi-arrow-left-right"></i> Ganti</button>
+          <button class="note-action" title="Ganti semua" onclick="editorReplaceAll()"><i class="bi bi-collection"></i> Semua</button>
+        </div>
+      </div>
+    </div>
+    <div class="code-editor-wrap">
+      <div class="code-editor-gutter" id="scratchGutter">1</div>
+      <div class="code-editor-textwrap">
+        <!-- Lapisan syntax highlight: teksnya sama persis dengan textarea di atasnya
+             (font/ukuran/padding/wrap sama), tapi cuma buat ditampilkan (pointer-events:none).
+             Teks asli di textarea dibikin transparan supaya yang kelihatan warna dari sini,
+             sementara kursor & seleksi tetap dari textarea aslinya. -->
+        <pre class="code-editor-highlight" id="scratchHighlight" aria-hidden="true"><code id="scratchHighlightCode" class="language-none"></code></pre>
+        <textarea id="scratchTextarea" class="scratch-textarea code-editor-textarea" spellcheck="false"
+          autocapitalize="off" autocomplete="off" autocorrect="off"
+          placeholder="Tulis teks/kode bebas di sini..."></textarea>
+      </div>
+    </div>
+    <div class="scratch-footer">
+      <span id="scratchStatus" class="scratch-status">&nbsp;</span>
+      <div class="scratch-actions">
+        <button class="note-action note-delete" title="Hapus file" id="editorDeleteBtn" style="display:none" onclick="deleteEditorFile()"><i class="bi bi-trash"></i></button>
+        <button class="note-action" title="Salin" onclick="copyScratch()"><i class="bi bi-copy"></i> Salin</button>
+        <button class="note-action" title="Simpan" onclick="saveScratch()"><i class="bi bi-check2"></i> Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Popup mengambang: muncul saat judul catatan diklik, menampilkan isi teks lengkap -->
+<div id="noteTextPopupOverlay" class="note-text-popup-overlay" onclick="closeNoteTextPopup()"></div>
+<div id="noteTextPopup" class="note-text-popup">
+  <div class="note-text-popup-header">
+    <span id="noteTextPopupTitle"></span>
+    <button class="icon-btn" onclick="closeNoteTextPopup()"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <div class="note-text-popup-body" id="noteTextPopupBody"></div>
+  <div class="note-text-popup-date" id="noteTextPopupDate"></div>
+  <div class="note-text-popup-actions">
+    <button class="note-action" title="Salin" id="popupCopyBtn"><i class="bi bi-copy"></i> Salin</button>
+    <button class="note-action" title="Edit" id="popupEditBtn"><i class="bi bi-pencil"></i> Edit</button>
+    <button class="note-action note-delete" title="Hapus" id="popupDeleteBtn"><i class="bi bi-trash"></i> Hapus</button>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"></script>
+<script src="/static/app.js"></script>
+<!-- Prism: cuma dipakai buat syntax highlighting di Teks Editor. Warna token diatur
+     sendiri lewat style.css (bukan pakai tema bawaan Prism) biar nyatu dengan tampilan
+     gelap aplikasi ini. Plugin autoloader otomatis ambil grammar bahasa yang dibutuhkan
+     (js/py/html/dst) belakangan, sesuai ekstensi file yang lagi dibuka.
+     PENTING: taruh SETELAH app.js + pakai "defer", supaya kalau CDN Prism lambat/tidak
+     bisa diakses (mis. server tidak ada internet), itu tidak ikut memblokir/menunda
+     app.js -- semua tombol (termasuk Edit -> buka Teks Editor) harus tetap jalan normal
+     biarpun syntax highlighting-nya gagal/telat muncul. -->
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"
+  onload="if (window.updateEditorHighlight) updateEditorHighlight();"></script>
+
+
+</body>
+</html>

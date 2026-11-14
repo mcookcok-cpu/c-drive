@@ -1,0 +1,2364 @@
+:root{
+  --bg:#121212;
+  --bg-row:#1c1c1e;
+  --bg-row-hover:#26262a;
+  --text:#e8e8e8;
+  --text-dim:#9a9a9e;
+  --accent:#8ab4f8;
+  --danger:#f28b82;
+  --topbar-h:58px; /* tinggi topbar "My Drive" -- dipakai juga buat naruh upload-manager di bawahnya */
+}
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',Roboto,Arial,sans-serif;
+  padding-bottom:40px;
+}
+
+.icon-btn{
+  background:none;
+  border:none;
+  color:var(--text);
+  font-size:20px;
+  padding:8px;
+  cursor:pointer;
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 12px;
+  min-height:var(--topbar-h);
+  position:static; /* dulu sticky top:0 -- sekarang ikut scroll biasa, tidak nempel/nutupin isi folder & tidak ketiban ke panel mengambang */
+  background:var(--bg);
+}
+
+.search-box{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#2a2a2d;
+  border-radius:24px;
+  padding:10px 16px;
+  color:var(--text-dim);
+}
+
+.search-box input{
+  flex:1;
+  background:none;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-size:15px;
+}
+
+.avatar{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  background:#3a3a3d;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.tabs{
+  display:flex;
+  gap:24px;
+  padding:4px 20px 12px;
+}
+
+.tab{
+  color:var(--text-dim);
+  font-size:15px;
+  padding-bottom:8px;
+}
+
+.tab.active{
+  color:var(--accent);
+  border-bottom:2px solid var(--accent);
+  font-weight:600;
+}
+
+.location-switch{
+  position:relative;
+  display:flex;
+  align-items:center;
+  margin-right:-12px;
+}
+
+.dropdown a.active{
+  color:var(--accent);
+}
+
+.path-bar{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:4px 20px 8px;
+  color:var(--text-dim);
+  font-size:14px;
+}
+
+.back-link{
+  color:var(--accent);
+  text-decoration:none;
+}
+
+.upload-bar{
+  display:flex;
+  gap:10px;
+  padding:0 16px 12px;
+}
+
+.upload-label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:#2a2a2d;
+  color:var(--text);
+  border:none;
+  border-radius:20px;
+  padding:8px 16px;
+  font-size:14px;
+  cursor:pointer;
+}
+
+.upload-label input[type=file]{
+  display:none;
+}
+
+.mkdir-box{
+  display:none;
+  gap:8px;
+  padding:0 16px 12px;
+}
+.mkdir-box.show{ display:flex; }
+.mkdir-box input[type=text]{
+  flex:1;
+  background:#2a2a2d;
+  border:none;
+  border-radius:20px;
+  padding:8px 14px;
+  color:var(--text);
+}
+.mkdir-box button{
+  background:var(--accent);
+  border:none;
+  border-radius:50%;
+  width:36px;
+  color:#121212;
+}
+
+.file-list{
+  display:flex;
+  flex-direction:column;
+}
+
+.row-item{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:10px 16px;
+  border-bottom:1px solid #232326;
+  background:var(--bg-row);
+  position:relative;
+}
+
+.row-item:active,
+.row-item:hover{
+  background:var(--bg-row-hover);
+}
+
+.row-icon{
+  width:44px;
+  height:44px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.icon-folder{
+  font-size:34px;
+  color:#c9c9cd;
+}
+
+.thumb{
+  width:44px;
+  height:44px;
+  object-fit:cover;
+  border-radius:6px;
+}
+
+.icon-badge{
+  width:38px;
+  height:38px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  color:#fff;
+}
+
+.badge-video{ background:#e05a5a; }
+.badge-pdf{ background:#e05a5a; }
+.badge-audio{ background:#34a853; }
+.badge-zip{ background:#f2a44b; }
+.badge-file{ background:#5a6270; }
+
+.row-info{
+  flex:1;
+  min-width:0;
+  cursor:pointer;
+}
+
+.row-name{
+  font-size:15px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.row-meta{
+  font-size:12.5px;
+  color:var(--text-dim);
+  margin-top:2px;
+}
+
+.row-menu{
+  position:relative;
+}
+
+.path-menu{
+  position:relative;
+}
+
+.dropdown{
+  display:none;
+  position:fixed;
+  background:#2a2a2d;
+  border-radius:10px;
+  overflow:hidden;
+  min-width:180px;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  z-index:300;
+}
+
+.dropdown.show{
+  display:flex;
+  flex-direction:column;
+}
+
+.dropdown a{
+  padding:12px 16px;
+  color:var(--text);
+  text-decoration:none;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.dropdown a:hover{
+  background:#3a3a3d;
+}
+
+.dropdown a.danger{
+  color:var(--danger);
+}
+
+/* Preview modal */
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.92);
+  z-index:100;
+  align-items:center;
+  justify-content:center;
+}
+
+.modal.show{
+  display:flex;
+}
+
+.modal-close{
+  position:absolute;
+  top:16px;
+  right:20px;
+  font-size:24px;
+  color:#fff;
+  cursor:pointer;
+  z-index:110;
+}
+
+.modal-body{
+  max-width:100%;
+  max-height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.modal-body img,
+.modal-body video{
+  max-width:100%;
+  max-height:90vh;
+  border-radius:8px;
+}
+
+/* Sidebar drawer */
+.sidebar-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  z-index:261; /* di ATAS topbar (252) -- pas sidebar kebuka, dia harus nutupin topbar, bukan ketiban */
+}
+.sidebar-overlay.show{ display:block; }
+
+.sidebar{
+  position:fixed;
+  top:0;
+  left:0;
+  bottom:0;
+  height:100vh;
+  height:100dvh; /* fallback lebih akurat kalau toolbar browser (mis. mode desktop) berubah tinggi */
+  width:280px;
+  max-width:82vw;
+  background:#1e1e21;
+  z-index:262; /* di ATAS topbar (252) & overlay-nya, biar drawer selalu di depan kalau kebuka */
+  transform:translateX(-100%);
+  transition:transform .25s ease;
+  display:flex;
+  flex-direction:column;
+  padding:20px 0;
+  overflow-y:auto;
+  overscroll-behavior:contain; /* biar scroll di sidebar gak "bocor"/nge-trigger scroll halaman di belakangnya */
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y; /* pastikan gesture vertikal & scroll mouse-wheel selalu kepegang elemen ini, bukan kelewatan ke belakang */
+}
+.sidebar.show{
+  transform:translateX(0);
+}
+
+.sidebar-title{
+  font-size:22px;
+  font-weight:600;
+  padding:8px 24px 20px;
+  border-bottom:1px solid #2c2c30;
+  margin-bottom:8px;
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+}
+
+.sidebar-version{
+  font-size:12px;
+  font-weight:500;
+  color:var(--text-dim);
+}
+
+.sidebar-menu{
+  display:flex;
+  flex-direction:column;
+}
+
+.sidebar-item{
+  display:flex;
+  align-items:center;
+  gap:20px;
+  padding:13px 24px;
+  color:var(--text);
+  text-decoration:none;
+  font-size:15px;
+  cursor:pointer;
+}
+
+.sidebar-item i{
+  font-size:18px;
+  width:20px;
+  text-align:center;
+  color:var(--text-dim);
+}
+
+.sidebar-item:hover{
+  background:#28282c;
+}
+
+.sidebar-storage{
+  margin-top:auto;
+  padding:16px 24px 4px;
+  border-top:1px solid #2c2c30;
+}
+
+.storage-label{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:var(--text-dim);
+  font-size:14px;
+  margin-bottom:10px;
+}
+
+.storage-bar{
+  height:4px;
+  background:#3a3a3d;
+  border-radius:2px;
+  overflow:hidden;
+  margin-bottom:8px;
+}
+
+.storage-bar-fill{
+  height:100%;
+  background:var(--accent);
+}
+
+.storage-text{
+  font-size:12.5px;
+  color:var(--text-dim);
+}
+
+/* ===== Panel Kontrol (sidebar) ===== */
+.sidebar-panel{
+  border-top:1px solid #2c2c30;
+  padding:8px 0 4px;
+}
+
+.panel-group{
+  border-bottom:1px solid #26262a;
+}
+
+.panel-header{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:none;
+  border:none;
+  color:var(--text);
+  font-size:14px;
+  font-weight:600;
+  padding:13px 24px;
+  cursor:pointer;
+}
+
+.panel-header i.bi-cpu,
+.panel-header i.bi-currency-bitcoin,
+.panel-header i.bi-journal-text,
+.panel-header i.bi-cloud-sun-fill{
+  color:var(--text-dim);
+  margin-right:10px;
+}
+
+.panel-chevron{
+  font-size:14px;
+  color:var(--text-dim);
+  transition:transform .2s ease;
+}
+
+.panel-header.open .panel-chevron,
+.panel-body.open ~ .panel-header .panel-chevron{
+  transform:rotate(180deg);
+}
+
+.panel-body{
+  max-height:0;
+  overflow:hidden;
+  padding:0 24px;
+  transition:max-height .25s ease, padding .25s ease;
+}
+
+.panel-body.open{
+  max-height:420px;
+  padding:2px 24px 16px;
+  overflow-y:auto;
+}
+
+/* Panel Kontrol: wadah luar yang menampung Monitor Sistem / Berita Crypto / Cuaca */
+.panel-body-outer.open{
+  max-height:2000px;
+  padding:4px 0 8px;
+}
+
+.panel-group.nested{
+  border-bottom:1px solid #26262a;
+  margin:0 20px;
+}
+
+.panel-group.nested:last-child{
+  border-bottom:none;
+}
+
+.panel-group.nested .panel-header{
+  padding:11px 4px;
+  font-size:13.5px;
+}
+
+.panel-group.nested .panel-body{
+  padding:0 4px;
+}
+
+.panel-group.nested .panel-body.open{
+  padding:2px 4px 14px;
+}
+
+.panel-loading{
+  color:var(--text-dim);
+  font-size:13px;
+  padding:6px 0;
+}
+
+/* Monitor sistem */
+.mini-gauge{
+  margin-bottom:12px;
+}
+
+.mini-gauge-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  color:var(--text-dim);
+  margin-bottom:5px;
+}
+
+.mini-gauge-bar{
+  height:6px;
+  background:#3a3a3d;
+  border-radius:3px;
+  overflow:hidden;
+}
+
+.mini-gauge-fill{
+  height:100%;
+  width:0%;
+  background:var(--accent);
+  transition:width .4s ease, background .3s ease;
+}
+
+.mini-gauge-fill.cpu{
+  background:#81c995;
+}
+
+.mini-gauge-fill.warn{
+  background:#fbbc04;
+}
+
+.mini-gauge-fill.danger{
+  background:var(--danger);
+}
+
+.mini-gauge-fill.battery{
+  background:#81c995;
+}
+
+.mini-gauge-fill.swap{
+  background:#c58af9;
+}
+
+.mini-gauge-sub{
+  font-size:11.5px;
+  color:var(--text-dim);
+  margin-top:4px;
+}
+
+.boost-btn{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  background:var(--accent);
+  color:#1a1a1d;
+  border:none;
+  border-radius:20px;
+  padding:9px 12px;
+  font-size:13.5px;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:6px;
+}
+
+.boost-btn:disabled{
+  opacity:.6;
+  cursor:default;
+}
+
+.boost-result{
+  font-size:12px;
+  color:var(--text-dim);
+  margin-top:8px;
+  min-height:14px;
+}
+
+/* Monitor sistem: uptime + proses RAM tertinggi */
+.sys-extra-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:12.5px;
+  color:var(--text-dim);
+  padding:8px 0;
+  border-top:1px solid #2c2c30;
+  margin-top:8px;
+}
+
+.sys-proc-list{
+  margin-bottom:4px;
+}
+
+.sys-proc-label{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  color:var(--text-dim);
+  margin-bottom:6px;
+}
+
+.sys-proc-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:12.5px;
+  padding:4px 0;
+}
+
+.sys-proc-name{
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:70%;
+}
+
+.sys-proc-ram{
+  color:var(--text-dim);
+}
+
+/* Manajemen Server */
+.restart-app-btn{
+  background:#3a3a3d;
+  color:var(--text);
+  margin-top:0;
+}
+
+.server-services-label{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  color:var(--text-dim);
+  margin:14px 0 8px;
+}
+
+.featured-services-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.featured-service-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  background:#2a2a2d;
+  border-radius:10px;
+  padding:9px 12px;
+}
+
+.featured-service-name{
+  font-size:13px;
+  font-weight:600;
+  color:var(--text);
+}
+
+.featured-service-switch{
+  display:flex;
+  align-items:center;
+  cursor:pointer;
+  flex-shrink:0;
+}
+
+.featured-service-switch input[type=checkbox]{
+  width:38px;
+  height:22px;
+  accent-color:var(--accent);
+}
+
+/* Sub-panel "Service lainnya" di dalam Manajemen Server */
+.panel-group.nested.sub{
+  margin:10px 0 0;
+  border-top:1px solid #26262a;
+  border-bottom:none;
+}
+
+.panel-group.nested.sub .panel-header{
+  padding:10px 2px;
+  font-size:12.5px;
+  color:var(--text-dim);
+  font-weight:600;
+}
+
+.sub-panel-count{
+  color:var(--text-dim);
+  font-weight:400;
+}
+
+.panel-group.nested.sub .panel-body{
+  padding:0 2px;
+}
+
+.panel-group.nested.sub .panel-body.open{
+  padding:2px 2px 10px;
+}
+
+.services-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.service-item{
+  background:#2a2a2d;
+  border-radius:10px;
+  padding:8px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.service-info{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+}
+
+.service-name{
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--text);
+}
+
+.service-status{
+  font-size:11px;
+  color:var(--text-dim);
+  text-transform:capitalize;
+}
+
+.service-status.up{
+  color:#81c995;
+}
+
+.service-status.down{
+  color:var(--danger);
+}
+
+.service-actions{
+  display:flex;
+  gap:2px;
+  flex-shrink:0;
+}
+
+/* Jaringan */
+.network-box, .security-box{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+/* Aplikasi & Dependensi */
+.deps-box{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.deps-section-label{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  color:var(--text-dim);
+  margin:12px 0 6px;
+}
+
+.deps-section-label:first-child{
+  margin-top:0;
+}
+
+.deps-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12.5px;
+  padding:6px 0;
+  border-bottom:1px solid #26262a;
+  gap:10px;
+}
+
+.deps-row-name{
+  color:var(--text);
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:1px;
+}
+
+.deps-row-wanted, .deps-row-note{
+  font-size:11px;
+  color:var(--text-dim);
+  font-weight:400;
+}
+
+.deps-row-status{
+  font-size:11px;
+  color:var(--text-dim);
+  flex-shrink:0;
+  text-align:right;
+  max-width:45%;
+}
+
+.deps-row-status.up{
+  color:#81c995;
+}
+
+.deps-row-status.down{
+  color:var(--danger);
+}
+
+.net-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12.5px;
+  padding:6px 0;
+  border-bottom:1px solid #26262a;
+  gap:10px;
+}
+
+.net-row:last-child{
+  border-bottom:none;
+}
+
+.net-row > span:first-child{
+  color:var(--text-dim);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.net-row > span:last-child{
+  color:var(--text);
+  text-align:right;
+  word-break:break-all;
+}
+
+.net-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  display:inline-block;
+}
+
+.net-dot.up{
+  background:#81c995;
+}
+
+.net-dot.down{
+  background:var(--danger);
+}
+
+/* Keamanan */
+.sec-block-label{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  color:var(--text-dim);
+  margin:14px 0 4px;
+}
+
+.sec-block-label:first-child{
+  margin-top:0;
+}
+
+.sec-fail-row{
+  display:flex;
+  flex-direction:column;
+  padding:6px 0;
+  border-bottom:1px solid #26262a;
+  font-size:12px;
+}
+
+.sec-fail-row:last-child{
+  border-bottom:none;
+}
+
+.sec-fail-user{
+  color:var(--text);
+  font-weight:600;
+}
+
+.sec-fail-meta{
+  color:var(--text-dim);
+  font-size:11px;
+  margin-top:2px;
+}
+
+/* Crypto */
+.crypto-list{
+  display:flex;
+  flex-direction:column;
+}
+
+.crypto-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  padding:8px 2px;
+  border-bottom:1px solid #26262a;
+}
+
+.crypto-item:last-child{
+  border-bottom:none;
+}
+
+.crypto-icon{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  flex-shrink:0;
+  background:#1b1b1e;
+}
+
+.crypto-symbol{
+  font-weight:600;
+  color:var(--text);
+  flex-shrink:0;
+  min-width:38px;
+}
+
+.crypto-chart{
+  width:56px;
+  height:22px;
+  flex-shrink:0;
+  margin-left:auto;
+}
+
+.crypto-chart .sparkline{
+  width:100%;
+  height:100%;
+  display:block;
+}
+
+.crypto-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:1px;
+  flex-shrink:0;
+  min-width:66px;
+}
+
+.crypto-price{
+  color:var(--text);
+  font-size:12.5px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.crypto-change{
+  font-size:11px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.crypto-change.up{
+  color:#81c995;
+}
+
+.crypto-change.down{
+  color:var(--danger);
+}
+
+/* ===== Catatan: panel dropdown kanan atas (bukan mengambang di atas konten) ===== */
+.notes-floating{
+  position:fixed;
+  right:10px;
+  top:60px;
+  width:min(320px, calc(100vw - 20px));
+  max-height:min(480px, calc(100vh - 76px));
+  background:#1e1e21;
+  border:1px solid #33333a;
+  border-radius:16px;
+  box-shadow:0 10px 34px rgba(0,0,0,.5);
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+  z-index:316; /* eksplisit di atas .scratch-floating (315) biar Catatan selalu di depan Teks Editor */
+}
+
+.notes-floating.show{
+  display:flex;
+}
+
+.notes-floating-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 14px;
+  font-size:14px;
+  font-weight:600;
+  color:var(--text);
+  background:#26262a;
+  cursor:move;
+  user-select:none;
+}
+
+.notes-floating-header span{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.notes-floating-body{
+  padding:12px 14px 14px;
+  overflow-y:auto;
+}
+
+.note-add-form{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:10px;
+}
+
+.note-add-form input{
+  flex:1 1 100%;
+  background:#2a2a2d;
+  border:none;
+  border-radius:10px;
+  padding:8px 12px;
+  color:var(--text);
+  font-size:13px;
+  outline:none;
+}
+
+.note-add-form textarea{
+  flex:1 1 100%;
+  background:#2a2a2d;
+  border:none;
+  border-radius:10px;
+  padding:8px 12px;
+  color:var(--text);
+  font-size:13px;
+  font-family:inherit;
+  outline:none;
+  resize:vertical;
+  min-height:56px;
+  box-sizing:border-box;
+}
+
+.note-add-form input#noteTitleInput{
+  font-weight:600;
+}
+
+.note-add-form button{
+  background:var(--accent);
+  border:none;
+  color:#1a1a1d;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  cursor:pointer;
+  flex-shrink:0;
+  margin-left:auto;
+}
+
+.notes-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.note-item{
+  background:#2a2a2d;
+  border-radius:10px;
+  padding:4px 6px 4px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.note-title-btn{
+  flex:1;
+  min-width:0;
+  background:none;
+  border:none;
+  text-align:left;
+  padding:6px 0;
+  cursor:pointer;
+  color:var(--text);
+}
+
+.note-title-text{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.note-date{
+  font-size:10.5px;
+  color:var(--text-dim);
+  margin-top:2px;
+}
+
+.note-action{
+  background:none;
+  border:none;
+  color:var(--text-dim);
+  cursor:pointer;
+  flex-shrink:0;
+  padding:6px 8px;
+  font-size:12.5px;
+  border-radius:6px;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+
+.note-action:hover{
+  color:var(--text);
+  background:rgba(255,255,255,.08);
+}
+
+.note-action.note-delete:hover{
+  color:var(--danger);
+}
+
+.note-edit-input{
+  width:100%;
+  background:#1e1e21;
+  border:1px solid #3a3a3d;
+  border-radius:8px;
+  padding:6px 8px;
+  color:var(--text);
+  font-size:12.5px;
+  outline:none;
+  box-sizing:border-box;
+}
+
+.note-empty{
+  color:var(--text-dim);
+  font-size:12.5px;
+}
+
+/* ===== Popup mengambang: isi catatan lengkap (muncul saat judul diklik) ===== */
+.note-text-popup-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  z-index:320;
+}
+
+.note-text-popup-overlay.show{
+  display:block;
+}
+
+.note-text-popup{
+  position:fixed;
+  left:50%;
+  top:50%;
+  transform:translate(-50%, -50%);
+  width:min(340px, calc(100vw - 48px));
+  max-height:min(480px, 70vh);
+  background:#1e1e21;
+  border:1px solid #33333a;
+  border-radius:16px;
+  box-shadow:0 14px 40px rgba(0,0,0,.55);
+  display:none;
+  flex-direction:column;
+  overflow:hidden;
+  z-index:330;
+}
+
+.note-text-popup.show{
+  display:flex;
+}
+
+.note-text-popup-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:14px 16px 6px;
+  font-size:15px;
+  font-weight:700;
+  color:var(--text);
+}
+
+.note-text-popup-header span{
+  overflow-wrap:anywhere;
+}
+
+.popup-edit-title{
+  font-size:14px;
+  font-weight:700;
+  flex:1;
+}
+
+.note-text-popup-body{
+  padding:6px 16px 4px;
+  font-size:13.5px;
+  line-height:1.5;
+  color:var(--text);
+  overflow-y:auto;
+  white-space:pre-wrap;
+  word-break:break-word;
+  outline:none;
+}
+
+.note-text-popup-body.editing{
+  background:#151517;
+  border-radius:8px;
+  margin:0 10px;
+  padding:8px;
+}
+
+textarea.note-text-popup-body{
+  width:calc(100% - 20px);
+  border:none;
+  outline:none;
+  resize:vertical;
+  font-family:inherit;
+  box-sizing:border-box;
+}
+
+.note-text-popup-date{
+  padding:6px 16px 0;
+  font-size:11px;
+  color:var(--text-dim);
+}
+
+.note-text-popup-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:2px;
+  padding:10px 12px 14px;
+}
+
+/* ===== Teks Editor: panel mengambang (editor kode) ===== */
+.scratch-floating{
+  max-height:min(680px, calc(100vh - 56px));
+  /* Lebih rendah dari .notes-floating (316) supaya Catatan selalu tampil di
+     ATAS Teks Editor kalau dua-duanya kebuka bareng -- sebelumnya z-index-nya
+     ikut warisan .notes-floating (316) juga, jadi serinya (316 vs 316) dan
+     yang menang cuma soal urutan DOM (Teks Editor lebih akhir = ketiban di atas). */
+  z-index:314;
+}
+
+.scratch-floating.fullscreen{
+  position:fixed;
+  inset:0;
+  top:0; left:0; right:0; bottom:0;
+  width:100%;
+  max-width:100%;
+  height:100%;
+  max-height:100%;
+  border-radius:0;
+  /* Harus di ATAS topbar pencarian "Telusuri di Drive" (z-index:252) --
+     sebelumnya cuma 200, jadi topbar itu ikut nempel & menimpa/menghalangi
+     bagian atas editor saat mode fullscreen dibuka. */
+  z-index:315;
+}
+
+.scratch-floating.fullscreen .code-editor-wrap{
+  flex:1;
+}
+
+.scratch-floating.fullscreen .scratch-textarea{
+  min-height:100%;
+  height:100%;
+}
+
+.editor-header-actions{
+  display:flex;
+  align-items:center;
+  gap:2px;
+}
+
+.scratch-body{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* Bar file + toolbar (Undo/Redo/Cari/Save As) menempel di atas panel saat
+   kode di-scroll ke bawah -- tidak ikut tergulung, dan diberi latar solid
+   supaya tidak menimpa/tembus pandang ke teks kode di baliknya. */
+.editor-topbar{
+  position:sticky;
+  top:0;
+  z-index:5;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  background:#1e1e21;
+  padding-top:2px;
+  padding-bottom:6px;
+  box-shadow:0 6px 10px -6px rgba(0,0,0,.4);
+}
+
+/* Satu baris ringkas: dropdown file + tombol ikon (Undo/Redo/Cari&Ganti/Save As) --
+   sebelumnya filebar & toolbar ini 2 baris terpisah dan makan tempat, sekarang
+   digabung jadi satu baris kecil biar area kode di bawahnya lebih lega. */
+.editor-topbar-row{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.editor-file-select{
+  flex:1;
+  min-width:0;
+  background:#151517;
+  border:1px solid #33333a;
+  border-radius:8px;
+  color:var(--text);
+  font-size:12px;
+  padding:6px 7px;
+  outline:none;
+  transition:border-color .15s ease;
+}
+
+.editor-file-select:focus{
+  border-color:var(--accent);
+}
+
+/* Bar pencarian & ganti kode (2 baris: Cari, lalu Ganti) */
+.editor-search-bar{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  background:#1b1b1e;
+  border:1px solid #33333a;
+  border-radius:8px;
+  padding:6px;
+  margin-top:2px;
+}
+
+.editor-search-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.editor-search-row .note-action{
+  flex-shrink:0;
+  white-space:nowrap;
+}
+
+.editor-search-input{
+  flex:1;
+  min-width:0;
+  background:transparent;
+  border:none;
+  color:var(--text);
+  font-size:12.5px;
+  padding:6px 4px;
+  outline:none;
+}
+
+.editor-search-count{
+  font-size:11px;
+  color:var(--text-dim);
+  white-space:nowrap;
+  min-width:32px;
+  text-align:right;
+}
+
+/* Editor kode ala vim/nano: gutter nomor baris + textarea monospace */
+.code-editor-wrap{
+  display:flex;
+  border:1px solid #2c2c30;
+  border-radius:12px;
+  overflow:hidden;
+  background:#151517;
+  flex:1;
+  min-height:340px;
+}
+
+.scratch-floating.fullscreen .code-editor-wrap{
+  min-height:0;
+}
+
+/* Nomor baris ditaruh menyatu dengan latar kode (bukan kolom abu-abu terpisah
+   dengan garis pembatas) supaya terasa "di dalam" kode dan lebih ringkas. */
+.code-editor-gutter{
+  flex-shrink:0;
+  padding:10px 6px 10px 10px;
+  background:#151517;
+  color:#4a4a52;
+  font-family:"SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  /* Harus SAMA PERSIS dengan font-size & line-height punya textarea (13px/1.5) --
+     sebelumnya 12.5px vs 13px punya textarea, bedanya kecil tapi ke-akumulasi
+     tiap baris sehingga nomor baris makin lama makin geser dari baris aslinya. */
+  font-size:13px;
+  line-height:1.5;
+  text-align:right;
+  white-space:pre;
+  overflow:hidden;
+  user-select:none;
+  border-right:none;
+  min-width:28px;
+}
+
+.scratch-textarea.code-editor-textarea{
+  position:relative;
+  z-index:1; /* di atas .code-editor-highlight, biar kursor/seleksi/ketikan tetap dari sini */
+  border:none;
+  border-radius:0;
+  font-family:"SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  background:transparent;
+  /* Teks aslinya dibikin transparan -- yang kelihatan warna-warni justru dari
+     lapisan .code-editor-highlight di baliknya (isinya disalin ulang tiap ketikan). */
+  color:transparent;
+  caret-color:var(--accent);
+  tab-size:2;
+  -moz-tab-size:2;
+  white-space:pre-wrap;
+  overflow-wrap:break-word;
+  word-break:break-word;
+  resize:none; /* penting: resize manual bikin tinggi textarea & gutter tidak sinkron lagi */
+  height:100%;
+  min-height:300px;
+}
+
+.scratch-textarea.code-editor-textarea::placeholder{
+  color:#5a5a62;
+  opacity:1;
+}
+
+.scratch-textarea.code-editor-textarea::selection{
+  background:rgba(138,180,248,.35);
+}
+
+.scratch-textarea.code-editor-textarea.no-wrap{
+  white-space:pre;
+  overflow-x:auto;
+  word-break:normal;
+}
+
+/* Lapisan syntax highlight: cuma buat ditampilkan (read-only, aria-hidden,
+   pointer-events:none). Isinya ditulis ulang dari nilai textarea tiap ada
+   perubahan (lihat updateEditorHighlight() di app.js), jadi selalu sinkron --
+   bukan elemen yang ikut diedit user, makanya aman menaruhnya sebagai overlay
+   tanpa bikin kursor/undo-redo meleset seperti pendekatan lama. Semua ukuran
+   font/spasi/wrap HARUS sama persis dengan textarea di atasnya supaya baris
+   demi baris pas menumpuk. */
+.code-editor-highlight{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  margin:0;
+  padding:10px 12px; /* sama persis dgn padding .scratch-textarea */
+  box-sizing:border-box;
+  overflow:hidden; /* scroll-nya digeser manual dari JS, samain kaya trik gutter */
+  pointer-events:none;
+  background:transparent;
+  border:none;
+  color:var(--text);
+  font-family:"SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size:13px;
+  line-height:1.5;
+  tab-size:2;
+  -moz-tab-size:2;
+  white-space:pre-wrap;
+  overflow-wrap:break-word;
+  word-break:break-word;
+}
+
+.code-editor-highlight.no-wrap{
+  white-space:pre;
+  word-break:normal;
+}
+
+.code-editor-highlight code{
+  display:block;
+  font-family:inherit;
+  font-size:inherit;
+  line-height:inherit;
+  white-space:inherit;
+  background:transparent;
+  color:inherit;
+  text-shadow:none;
+}
+
+/* Palet token Prism, disesuaikan manual (bukan tema bawaan) biar nyatu sama
+   warna gelap aplikasi ini. */
+.code-editor-highlight .token.comment,
+.code-editor-highlight .token.prolog,
+.code-editor-highlight .token.doctype,
+.code-editor-highlight .token.cdata{
+  color:#6a6a72;
+  font-style:italic;
+}
+.code-editor-highlight .token.string,
+.code-editor-highlight .token.attr-value,
+.code-editor-highlight .token.char{
+  color:#9fd88a;
+}
+.code-editor-highlight .token.number,
+.code-editor-highlight .token.boolean,
+.code-editor-highlight .token.constant{
+  color:#f0a868;
+}
+.code-editor-highlight .token.keyword,
+.code-editor-highlight .token.selector,
+.code-editor-highlight .token.at-rule,
+.code-editor-highlight .token.important{
+  color:#c792ea;
+}
+.code-editor-highlight .token.function,
+.code-editor-highlight .token.class-name{
+  color:#82aaff;
+}
+.code-editor-highlight .token.tag,
+.code-editor-highlight .token.attr-name,
+.code-editor-highlight .token.property{
+  color:#ff8a8a;
+}
+.code-editor-highlight .token.operator,
+.code-editor-highlight .token.punctuation{
+  color:#a8a8b0;
+}
+.code-editor-highlight .token.variable,
+.code-editor-highlight .token.regex{
+  color:#f0c674;
+}
+
+.code-editor-textwrap{
+  position:relative;
+  flex:1;
+  min-width:0;
+  display:flex;
+  border-radius:10px;
+  transition:box-shadow .15s ease;
+}
+
+.code-editor-textwrap:focus-within{
+  box-shadow:inset 0 0 0 1.5px var(--accent);
+}
+
+.scratch-textarea{
+  width:100%;
+  min-height:300px;
+  background:#151517;
+  border:1px solid #33333a;
+  border-radius:10px;
+  padding:10px 12px;
+  color:var(--text);
+  font-size:13px;
+  font-family:inherit;
+  line-height:1.5;
+  outline:none;
+  resize:vertical;
+  box-sizing:border-box;
+}
+
+.scratch-footer{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.scratch-status{
+  font-size:11px;
+  color:var(--text-dim);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.scratch-actions{
+  display:flex;
+  gap:2px;
+  flex-shrink:0;
+}
+
+/* Cuaca */
+
+.weather-box{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.weather-icon{
+  font-size:34px;
+  color:var(--accent);
+}
+
+.weather-temp{
+  font-size:22px;
+  font-weight:600;
+}
+
+.weather-desc{
+  font-size:12.5px;
+  color:var(--text-dim);
+}
+
+.weather-place{
+  font-size:11.5px;
+  color:var(--text-dim);
+  margin-top:2px;
+}
+
+/* ===== Halaman Login ===== */
+.login-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+
+.login-box{
+  width:100%;
+  max-width:340px;
+  background:#1e1e21;
+  border-radius:16px;
+  padding:32px 28px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.login-logo{
+  font-size:36px;
+  color:var(--accent);
+  text-align:center;
+}
+
+.login-title{
+  font-size:19px;
+  font-weight:600;
+  text-align:center;
+  margin-bottom:4px;
+}
+
+.login-error{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(242,139,130,.12);
+  color:var(--danger);
+  font-size:13px;
+  padding:10px 12px;
+  border-radius:10px;
+}
+
+.login-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:13px;
+  color:var(--text-dim);
+}
+
+.login-field input{
+  background:#2a2a2d;
+  border:none;
+  border-radius:10px;
+  padding:11px 14px;
+  color:var(--text);
+  font-size:15px;
+  outline:none;
+}
+
+.login-field input:focus{
+  outline:1.5px solid var(--accent);
+}
+
+.login-btn{
+  background:var(--accent);
+  color:#1a1a1d;
+  border:none;
+  border-radius:10px;
+  padding:12px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:6px;
+}
+
+/* Progress bar generik (dipakai ulang di dalam item Upload Manager) */
+.upload-progress-bar{
+  height:6px;
+  background:#3a3a3d;
+  border-radius:3px;
+  overflow:hidden;
+}
+.upload-progress-fill{
+  height:100%;
+  width:0%;
+  background:var(--accent);
+  transition:width .15s ease;
+}
+
+/* ===== Upload Manager & Task Manager: nempel (sticky) di paling atas layar saat discroll ===== */
+.sticky-banners{
+  position:sticky;
+  top:0;
+  z-index:250;
+}
+.upload-manager{
+  display:none;
+  background:#1e1e21;
+  border-bottom:1px solid #33333a;
+  box-shadow:0 4px 16px rgba(0,0,0,.35);
+}
+.upload-manager.show{
+  display:block;
+}
+
+.upload-manager-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 16px;
+  font-size:14px;
+  font-weight:600;
+  color:var(--text);
+  background:#26262a;
+  cursor:pointer;
+  user-select:none;
+}
+.upload-manager-header span{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.upload-manager-count{
+  color:var(--accent);
+  font-weight:600;
+}
+.upload-manager-header-actions{
+  display:flex;
+  gap:2px;
+}
+.upload-manager-header-actions .icon-btn{
+  font-size:16px;
+  padding:6px;
+}
+
+.upload-manager-body{
+  padding:10px 16px 14px;
+  max-height:280px;
+  overflow-y:auto;
+}
+.upload-manager.collapsed .upload-manager-body{
+  display:none;
+}
+
+.upload-manager-empty{
+  color:var(--text-dim);
+  font-size:13px;
+  padding:8px 0;
+}
+
+.upload-manager-item{
+  background:#28282c;
+  border-radius:10px;
+  padding:10px 12px;
+  margin-bottom:8px;
+}
+.upload-manager-item:last-child{
+  margin-bottom:0;
+}
+
+.upload-manager-item-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:13.5px;
+  margin-bottom:6px;
+}
+.upload-manager-item-name{
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.upload-manager-item-status{
+  font-weight:600;
+  white-space:nowrap;
+  font-size:12px;
+  color:var(--accent);
+}
+.upload-manager-item[data-status="paused"] .upload-manager-item-status{ color:#e6b800; }
+.upload-manager-item[data-status="error"] .upload-manager-item-status{ color:var(--danger); }
+.upload-manager-item[data-status="cancelled"] .upload-manager-item-status{ color:var(--text-dim); }
+.upload-manager-item[data-status="done"] .upload-manager-item-status{ color:#3ecf6e; }
+
+.upload-manager-item-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:6px;
+  font-size:12px;
+  color:var(--text-dim);
+}
+.upload-manager-item-actions{
+  display:flex;
+  gap:2px;
+}
+.upload-manager-item-actions .icon-btn{
+  width:26px;
+  height:26px;
+  font-size:13px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* Settings: panel mengambang di depan sidebar (bukan lagi bottom sheet) */
+/* Dipakai juga oleh modal Sampah & Pindah/Salin ke... -- harus di ATAS
+   topbar pencarian (z-index:252) supaya tidak ketiban/ketutup topbar juga. */
+.settings-modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:315;
+  background:transparent;
+}
+.settings-modal.show{
+  display:block;
+}
+.settings-modal .settings-box{
+  position:fixed;
+  left:16px;
+  top:16px;
+  max-height:calc(100vh - 32px);
+  overflow-y:auto;
+  width:calc(280px - 32px);
+  max-width:82vw;
+  background:#26262a;
+  border-radius:16px;
+  padding:14px 0;
+  box-shadow:0 12px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04);
+  animation:settingsPop .16s ease;
+}
+@keyframes settingsPop{
+  from{ opacity:0; transform:translateY(8px) scale(.97); }
+  to{ opacity:1; transform:translateY(0) scale(1); }
+}
+.settings-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:16px;
+  font-weight:600;
+  padding:0 18px 12px;
+  border-bottom:1px solid #34343a;
+  margin-bottom:6px;
+  position:relative;
+}
+.settings-header .modal-close{
+  position:static;
+  font-size:16px;
+  color:var(--text-dim);
+}
+.settings-row{
+  padding:2px 10px;
+}
+.switch-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:14px;
+  cursor:pointer;
+  padding:10px 8px;
+  border-radius:10px;
+}
+.switch-row:hover{
+  background:#31313a;
+}
+.switch-row-icon{
+  font-size:17px;
+  color:var(--text-dim);
+  flex-shrink:0;
+  width:20px;
+  text-align:center;
+}
+.switch-row span{
+  flex:1;
+  min-width:0;
+}
+.switch-row input[type=checkbox]{
+  width:20px;
+  height:20px;
+  accent-color:var(--accent);
+  flex-shrink:0;
+  margin:0;
+}
+
+/* Sort toggle button di path-bar */
+.path-bar{
+  justify-content:space-between;
+}
+.sort-btn{
+  margin-left:auto;
+  font-size:17px;
+  padding:6px;
+}
+
+/* Pesan kosong (dipakai antara lain oleh panel Sampah) */
+.folder-picker-empty{
+  padding:16px 12px;
+  color:var(--text-dim);
+  font-size:13.5px;
+  text-align:center;
+}
+
+/* Modal konflik nama saat Tempel (Batal / Simpan salinan / Timpa) */
+.overwrite-modal .settings-box{
+  position:static;
+  width:100%;
+  max-width:340px;
+}
+.overwrite-message{
+  padding:2px 18px 14px;
+  font-size:14px;
+  line-height:1.5;
+  color:var(--text);
+  word-break:break-word;
+}
+.overwrite-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:8px;
+  padding:12px 18px 2px;
+  border-top:1px solid #34343a;
+  margin-top:8px;
+}
+
+/* CLI: terminal web sederhana */
+.cli-modal{
+  z-index:340;
+}
+.cli-box{
+  width:min(640px, 92vw);
+  height:min(560px, 78vh);
+  background:#101012;
+  border:1px solid #2c2c30;
+  border-radius:16px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 14px 44px rgba(0,0,0,.6);
+}
+.cli-header{
+  padding:14px 16px;
+  border-bottom:1px solid #2c2c30;
+  margin-bottom:0;
+  flex-shrink:0;
+}
+.cli-term-wrap{
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+  padding:8px 10px;
+  background:#0d1117;
+  touch-action:pan-y;
+}
+.cli-term-wrap .xterm{
+  height:100%;
+}
+.cli-term-wrap .xterm-viewport{
+  overflow-y:auto !important;
+}
+.cli-box.fullscreen{
+  width:100vw;
+  height:100dvh;
+  max-width:100vw;
+  max-height:100dvh;
+  border-radius:0;
+  border:none;
+}
+.cli-term-wrap{
+  padding-bottom:52px; /* ruang cadangan biar teks paling bawah nggak ketutupan cli-keybar */
+}
+.cli-keybar{
+  display:flex;
+  gap:5px;
+  padding:6px 8px calc(6px + env(safe-area-inset-bottom));
+  overflow-x:auto;
+  flex-shrink:0;
+  background:#101012;
+  border-top:1px solid #2c2c30;
+  -webkit-overflow-scrolling:touch;
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:350;
+}
+.cli-key{
+  flex:0 0 auto;
+  min-width:38px;
+  padding:6px 8px;
+  border-radius:8px;
+  border:1px solid #34343a;
+  background:#1c1c20;
+  color:#e6edf3;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.02em;
+  cursor:pointer;
+  user-select:none;
+}
+.cli-key:active{
+  background:#2a2a30;
+}
+.cli-key-toggle.active{
+  background:#3a6df0;
+  border-color:#3a6df0;
+  color:#fff;
+}
+
+.btn-secondary,
+.btn-primary{
+  border:none;
+  border-radius:20px;
+  padding:8px 18px;
+  font-size:14px;
+  cursor:pointer;
+}
+.btn-secondary{
+  background:none;
+  color:var(--text-dim);
+}
+.btn-primary{
+  background:var(--accent);
+  color:#121212;
+  font-weight:600;
+}
+
+/* Modal Sampah (Trash) */
+.trash-modal .settings-box{
+  position:static;
+  width:100%;
+  max-width:380px;
+  max-height:76vh;
+  display:flex;
+  flex-direction:column;
+}
+.trash-hint{
+  padding:0 18px 8px;
+  font-size:12.5px;
+  color:var(--text-dim);
+  border-bottom:1px solid #34343a;
+  margin-bottom:4px;
+}
+.trash-list{
+  overflow-y:auto;
+  padding:4px 6px;
+  min-height:80px;
+}
+.trash-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 12px;
+  border-radius:8px;
+}
+.trash-item:hover{
+  background:#31313a;
+}
+.trash-item-icon{
+  font-size:20px;
+  color:var(--text-dim);
+  flex-shrink:0;
+  width:24px;
+  text-align:center;
+}
+.trash-item-info{
+  flex:1;
+  min-width:0;
+}
+.trash-item-name{
+  font-size:14.5px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.trash-item-meta{
+  font-size:12px;
+  color:var(--text-dim);
+  line-height:1.5;
+}
+.trash-item-actions{
+  display:flex;
+  gap:4px;
+  flex-shrink:0;
+}
+.trash-actions{
+  display:flex;
+  justify-content:center;
+  padding:12px 18px 2px;
+  border-top:1px solid #34343a;
+  margin-top:8px;
+}
+.trash-empty-btn{
+  color:#e05a5a;
+}
+
+/* Mode seleksi (checkbox per item) */
+.icon-btn.active{
+  color:var(--accent);
+}
+
+.row-checkbox{
+  display:none;
+  align-items:center;
+  justify-content:center;
+  width:22px;
+  flex-shrink:0;
+}
+.file-list.select-mode .row-checkbox{
+  display:flex;
+}
+.file-list.select-mode .row-menu{
+  display:none;
+}
+.item-checkbox{
+  width:20px;
+  height:20px;
+  accent-color:var(--accent);
+}
+
+/* Toolbar aksi mode seleksi (Pindah / Salin / Hapus) */
+.selection-bar{
+  display:none;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background:#1e1e21;
+  border-top:1px solid #2c2c30;
+  padding:10px 16px;
+  z-index:140;
+  box-shadow:0 -4px 16px rgba(0,0,0,.35);
+}
+.selection-bar.show{
+  display:flex;
+}
+
+/* Bar mode tempel (Pindah/Salin -> Tempel di sini) */
+.clipboard-bar .selection-info{
+  color:var(--text-dim);
+  font-size:13.5px;
+}
+.clipboard-bar .selection-info i{
+  color:var(--accent);
+  font-size:16px;
+}
+.clipboard-paste-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  white-space:nowrap;
+}
+.selection-info{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+.select-all-label{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:14px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.select-all-label input[type=checkbox]{
+  width:19px;
+  height:19px;
+  accent-color:var(--accent);
+}
+.selection-actions{
+  display:flex;
+  gap:4px;
+}
+body.select-mode-active{
+  padding-bottom:92px;
+}
+
+/* Pull-to-refresh: indikator muncul saat halaman ditarik ke bawah dari posisi mentok atas */
+.pull-refresh-indicator{
+  position:fixed;
+  top:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:40px;
+  height:40px;
+  margin-top:-40px;
+  border-radius:50%;
+  background:var(--surface, #1a1a1d);
+  border:1px solid #2c2c30;
+  color:var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  z-index:500;
+  opacity:0;
+  transition:opacity .15s ease, background .15s ease, color .15s ease;
+  pointer-events:none;
+}
+.pull-refresh-indicator.show{
+  opacity:1;
+}
+.pull-refresh-indicator.ready{
+  color:#fff;
+  background:var(--accent);
+}
+.pull-refresh-indicator.loading i{
+  animation:pullRefreshSpin .7s linear infinite;
+}
+@keyframes pullRefreshSpin{
+  from{ transform:rotate(0deg); }
+  to{ transform:rotate(360deg); }
+}
+
+/* Halaman PM2 (sidebar) */
+.pm2-modal.show{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.5);
+  padding:16px;
+}
+.pm2-modal .settings-box.pm2-box{
+  position:static;
+  width:100%;
+  max-width:440px;
+  max-height:84vh;
+  display:flex;
+  flex-direction:column;
+}
+.pm2-summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:0 12px 8px 18px;
+  font-size:12.5px;
+  color:var(--text-dim);
+  border-bottom:1px solid #34343a;
+}
+.pm2-list{
+  overflow-y:auto;
+  padding:6px;
+  min-height:80px;
+}
+.pm2-item{
+  padding:10px 12px;
+  border-radius:8px;
+}
+.pm2-item:hover{
+  background:#31313a;
+}
+.pm2-item-top{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.pm2-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  flex-shrink:0;
+  background:#e05a5a;
+}
+.pm2-dot.online{
+  background:#4cc38a;
+}
+.pm2-name{
+  flex:1;
+  min-width:0;
+  font-size:14.5px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.pm2-status{
+  font-size:11.5px;
+  color:#e05a5a;
+}
+.pm2-status.online{
+  color:#4cc38a;
+}
+.pm2-meta{
+  font-size:12px;
+  color:var(--text-dim);
+  line-height:1.5;
+  margin:2px 0 6px 17px;
+}
+.pm2-links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-left:17px;
+}
+.pm2-link{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 10px;
+  border-radius:14px;
+  font-size:12.5px;
+  color:var(--accent);
+  background:#26262d;
+  border:1px solid #3a3a44;
+  text-decoration:none;
+}
+.pm2-link:hover{
+  background:#2f3340;
+}
+.pm2-link.disabled{
+  color:var(--text-dim);
+  border-style:dashed;
+  cursor:default;
+}
+.pm2-link.disabled:hover{
+  background:#26262d;
+}
+.pm2-noport{
+  font-size:12px;
+  color:var(--text-dim);
+}
